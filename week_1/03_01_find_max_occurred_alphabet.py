@@ -1,3 +1,6 @@
+# 문제
+# 다음과 같은 문자열을 입력받았을 때, 어떤 알파벳이 가장 많이 포함되어 있는지 반환하시오.
+
 input = "hello my name is sparta"
 
 
@@ -6,7 +9,7 @@ input = "hello my name is sparta"
 # 2. max_occurrence, max_alphabet, occurrence 변수 = 3
 # 이 함수는 총 29 만큼의 공간이 사용됨
 # 시간 복잡도
-# 1. alphabet_array 의 길이 * 대입 연산 1번               // (20~21 번째 코드)
+# 1. alphabet_array 의 길이 * 대입 연산 1번  (for 문)             // (20~21 번째 코드)
 # 2. alphabet_array 의 길이 * string 의 길이 * (비교 연산 1번 + 대입 연산 1번)         // (22~24 번째 코드)
 # 3. alphabet_array 의 길이 * (비교 연산 1번 + 대입 연산 2번)                    // (26~28 번째 코드)
 # string 의 길이는 보통 N 이라고 표현
