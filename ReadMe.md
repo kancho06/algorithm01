@@ -340,7 +340,7 @@ i am created!  <__main__.Person object at 0x000001353E3CA7F0>
 
 ## 링크드 리스트
 
-### 링크드 리스트 구현
+### 링크드 리스트 이해하기 (구현해보기)
 
 ```python
 train_compartments = ["기관실"] -> ["시멘트"] -> ["자갈"] -> ["밀가루"] -> ["우편"]
@@ -423,5 +423,78 @@ class LinkedList:
 linked_list = LinkedList(3)
 linked_list.append(4)
 linked_list.append(5)
+linked_list.print_all()
+```
+
+
+
+### 링크드 리스트 index번째 작업
+
+<aside> ❓ 링크드 리스트에서 index번째 원소를 반환, 추가, 삭제하시오.
+
+</aside>
+
+ex.)
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self, value):
+        self.head = Node(value)
+
+    def append(self, value):
+        cur = self.head
+        while cur.next is not None:
+            cur = cur.next
+        cur.next = Node(value)
+
+    def print_all(self):
+        cur = self.head
+        while cur is not None:
+            print(cur.data)
+            cur = cur.next
+
+    def get_node(self, index):
+        node = self.head
+        count = 0
+        while count < index:
+            node = node.next
+            count += 1
+        return node
+
+    def add_node(self, index, value):
+        new_node = Node(value)  # [6]
+        if index == 0:
+            new_node.next = self.head  # [6] -> [5]
+            self.head = new_node  # head -> [6] -> [5] ->  .... 헤드교체
+            return
+
+        node = self.get_node(index - 1)  # [5]
+        next_node = node.next  # [12]
+        node.next = new_node  # [5] -> [6]
+        new_node.next = next_node  # [6] -> [12]
+
+    #   index     next_node
+    # ["자갈"] -> ["밀가루"] -> ["우편"]
+    #       new_node
+    #    -> ["흑연"] ->
+
+    def delete_node(self, index):
+        if index == 0:
+            self.head = self.head.next
+            return
+
+        node = self.get_node(index - 1)
+        node.next = node.next.next
+
+linked_list = LinkedList(5)
+linked_list.append(12)
+linked_list.add_node(0, 3)
+linked_list.print_all()
+linked_list.delete_node(0)
 linked_list.print_all()
 ```
