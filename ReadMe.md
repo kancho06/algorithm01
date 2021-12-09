@@ -20,7 +20,7 @@
 
 - [링크드 리스트](#링크드-리스트)
 
-
+- [이진 탐색 & 순차 탐색](#이진-탐색-&-순차-탐색)
 
 
 
@@ -498,3 +498,214 @@ linked_list.print_all()
 linked_list.delete_node(0)
 linked_list.print_all()
 ```
+
+
+
+### 링크드 리스트 합 계산
+
+<aside> ❓ 다음과 같은 두 링크드 리스트를 입력받았을 때, 합산한 값을 반환하시오.
+
+예를들어 아래와 같은 링크드 리스트를 입력받았다면, 각각 678, 354 이므로 두개의 총합 678 + 354 = 1032 를 반환해야한다.
+
+</aside>
+
+<aside> 👉 [6] → [7] → [8]
+    
+</aside>
+
+​	  [3] → [5] → [4]
+
+</aside>
+
+**ex.)**
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class LinkedList:
+    def __init__(self, value):
+        self.head = Node(value)
+
+    def append(self, value):
+        cur = self.head
+        while cur.next is not None:
+            cur = cur.next
+        cur.next = Node(value)
+
+def get_linked_list_sum(linked_list_1, linked_list_2):
+    sum_1 = _get_linked_list_sum(linked_list_1)
+    sum_2 = _get_linked_list_sum(linked_list_2)
+
+    return sum_1 + sum_2
+
+def _get_linked_list_sum(linked_list):
+    linked_list_sum = 0
+    head = linked_list.head
+    while head is not None:   # 그냥 더하면 6 + 7 + 8 이 되니 더하기전에 x 10 을 해주고 더해준다.
+        linked_list_sum = linked_list_sum * 10 + head.data
+        head = head.next
+
+    return linked_list_sum
+
+# [6] -> [7] -> [8]
+linked_list_1 = LinkedList(6)
+linked_list_1.append(7)
+linked_list_1.append(8)
+# [3] -> [5] -> [4]
+linked_list_2 = LinkedList(3)
+linked_list_2.append(5)
+linked_list_2.append(4)
+
+print(get_linked_list_sum(linked_list_1, linked_list_2))
+```
+
+
+
+---
+
+
+
+## 이진 탐색 & 순차 탐색
+
+### 순차 탐색 O(N)
+
+```python
+finding_target = 14
+finding_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+def is_existing_target_number_sequential(target, array):
+	for number in array:
+		if target == number:
+			return True
+	
+	return False
+
+result = is_existing_target_number_sequential(finding_target, finding_numbers)
+print(result) #True
+```
+
+### 이진 탐색 O(logN) → logN은 연산량이 반으로 줄엇다는 뜻
+
+```python
+finding_target = 14
+finding_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]
+
+def is_existing_target_number_binary(target, array):
+    current_min = 0
+    current_max = len(array) - 1
+    current_guess = (current_min + current_max) // 2
+
+    while current_min <= current_max:
+        if array[current_guess] == target:
+            return True
+        elif array[current_guess] < target:
+            current_min = current_guess + 1
+        else:
+            current_max = current_guess - 1
+        current_guess = (current_min + current_max) // 2
+
+    return False
+
+result = is_existing_target_number_binary(finding_target, finding_numbers)
+print(result)
+```
+
+- 이진 탐색은 리스트가 정렬이 되어있을때만 사용이 가능하다.
+
+
+
+---
+
+
+
+## 재귀 함수
+
+<aside> 📘 재귀(Recursion)은 어떠한 것을 정의할 때 자기 자신을 참조하는 것을 뜻한다. [위키백과]
+
+</aside>
+
+```python
+# 재귀함수는 무한루프에 빠질 수 있기때문에 빠져나올 지점을 잘 설정해주어야 한다.
+
+def count_down(number):
+    if number < 0:
+        return
+    print(number)
+    count_down(number - 1) # count_down 함수(함수 본인)를 number - 1 인자를 주고 다시 호출한다!
+
+count_down(60)
+```
+
+**재귀함수와 관련된 대표적인 문제 팩토리얼**
+
+```python
+# 5 * factorial(4)
+# 5 * 4 * factorial(3)
+# 5 * 4 * 3 * factorial(2)
+# 5 * 4 * 3 * 2 * factorial(1)
+#                  factorial(1) 에서 if 문 리턴 1
+# 5 * 4 * 3 * 2 * 1
+def factorial(n):
+    if n == 1:
+        return 1
+
+    return n * factorial(n -1)
+
+print(factorial(5))
+```
+
+**회문 검사 (회문 : 일요일, 토마토 처럼 뒤집어도 똑같은 단어나 문장)**
+
+- 재귀 함수를 이용하지 않았을때 (가운데 한글자 이외에 모든글자가 대칭이 되야함)
+
+```python
+input = "abcba"
+
+def is_palindrome(string):
+    n = len(string)
+    for i in range(n):
+        if string[i] != string[n - 1 - i]:  # 첫번째가 0 맨뒤가 n - 1이므로
+            return False
+
+    return True
+
+print(is_palindrome(input))
+```
+
+- 재귀 함수를 이용했을때 (재귀 함수는 반복되는 구조로 문제를 점점 작게 만든다.)
+
+```python
+input = "abcba"
+
+def is_palindrome(string):
+    if len(string) <= 1:
+        return True
+
+    if string[0] != string[-1]:
+        return False
+
+    return is_palindrome(string[1:-1])
+
+print(is_palindrome(input))
+```
+
+에러나는 코드 (원인 ⇒ if 문과 elif 문이 동시에 작동해서 none 반환)
+
+```python
+input = "abcba"
+
+def is_palindrome2(string):
+    print(string)
+    if len(string) == 1:
+        return True
+    elif string[0] == string[-1]:
+        is_palindrome2(string[1:-1])
+    else:
+        return False
+
+print(is_palindrome2(input))
+```
+
