@@ -740,3 +740,167 @@ def bubble_sort(array):
 bubble_sort(input)
 print(input)  # [1, 2, 4, 6, 9] 가 되어야 합니다!
 ```
+
+
+
+### 선택 정렬 (Selection Sort)
+
+선택 정렬은 모든 리스트를 확인한 후 그 중 가장 작은 숫자를 맨 앞으로 보낸후 나머지를 다시보고 하는식의 정렬 방법이다.
+
+버블 정렬보다 훨씬 적은 비교를 하는 것 같지만, 실제로는 각 배열을 계속해서 탐색하는 방식이라 2중 반복문을 사용해야한다.
+
+```python
+input = [4, 6, 2, 9, 1]
+
+# 총 시간 복잡도 O(N**2) -> 반복문 2번
+def selection_sort(array):
+    n = len(array)
+
+    for i in range(n - 1):
+        min_index = i
+        for j in range(n - i):
+            if array[i + j] < array[min_index]:     # 현재 돌고있는 index = i+j 가 min_index 보다 작다면
+                min_index = i + j                   # 예를 들어 0 번째 i 에 4번째 j 라면  1이고
+                                                    # min_index 가 0 이므로 array[min_index]는 4이고 1이 더 작으므로
+        array[i], array[min_index] = array[min_index], array[i]     # min_index 의 자리를 i 앞으로 바꿔준다.
+    return
+
+selection_sort(input)
+print(input) # [1, 2, 4, 6, 9] 가 되어야 한다.
+```
+
+### 삽입 정렬 (Insertion Sort)
+
+선택 정렬이 전체에서 최솟값을 "선택" 하는 거 였다면,
+
+삽입 정렬은 전체에서 하나씩 올바른 위치에 "삽입"하는 방식이다.
+
+선택 정렬은 현재 데이터의 상태와 상관없이 항상 비교하고 위치를 바꾸지만,
+
+삽입 정렬은 필요할 때만 위치를 변경하므로 더 효율적인 방식이다.
+
+```python
+input = [4, 6, 2, 9, 1]
+
+# 총 시간 복잡도  .최선의 경우 O(N), 아닌 경우 O(N**2)
+# 거의 정렬이 된상태의 배열을 입력했을경우 더 효율적인 시간 복잡도 결과를 얻을 수 있다.
+def insertion_sort(array):
+    n = len(array)
+    for i in range(1, n):
+        for j in range(i):
+            if array[i - j - 1] > array[i - j]:     # 예를 들어 i = 1, j = 0 일때, 0번째 어레이값과 1번째 어레이값을 비교
+                                                    # 이전 어레이 값이 더 크다면 자리를 바꾼다.
+                array[i - j - 1], array[i - j] = array[i - j], array[i - j -1]
+            else:
+                break       # 모두 다 비교 해보지 않고 앞에것만 비교해보고 아니면 바로 반복문을 끝낸다.
+    return
+
+insertion_sort(input)
+print(input) # [1, 2, 4, 6, 9] 가 되어야 합니다!
+```
+
+### 병합 정렬 (Merge)
+
+병합 정렬 부터는 면접에서 직접 구현해보라고 하는 구현 방법들이다.
+
+병합 정렬은 배열의 앞부분과 뒷부분의 두 그룹으로 나누어 각 각 정렬한 후 병합하는 작업을 반복하는 알고리즘이다.
+
+ex.) 병합
+
+A 라고 하는 배열이 1, 2, 3, 5 로 정렬되어 있고,
+
+B 라고 하는 배열이 4, 6, 7, 8 로 정렬되어 있다면
+
+이 두 집합을 합쳐가면서 정렬하는 방법이다.
+
+[1, 2, 3, 5] # 정렬된 배열 A [4, 6, 7, 8] # 정렬된 배열 B [] # 두 집합을 합칠 빈 배열 C ↓ 1단계 : [1, 2, 3, 5] ↓ [4, 6, 7, 8] 1과 4를 비교 1 < 4 이므로 1을 C 에 넣는다. C:[1] ↓ 2단계 : [1, 2, 3, 5] ↓ [4, 6, 7, 8] 2와 4를 비교 2 < 4 이므로 2를 C 에 넣는다. C:[1, 2] ↓ 3단계 : [1, 2, 3, 5] ↓ [4, 6, 7, 8] 3과 4를 비교 3 < 4 이므로 3을 C 에 넣는다. C:[1, 2, 3]
+
+↓ 3단계 : [1, 2, 3, 5] ↓ [4, 6, 7, 8] 5와 4를 비교 5 > 4 이므로 4을 C 에 넣는다. C:[1, 2, 3, 4] ↓ 3단계 : [1, 2, 3, 5] ↓ [4, 6, 7, 8] 5와 6을 비교 5 < 6 이므로 5을 C 에 넣는다. C:[1, 2, 3, 4, 5] 나머지는 하나씩 C 에 추가해주면 된다. C:[1, 2, 3, 4, 5, 6, 7, 8]
+
+```python
+array_a = [1, 2, 3, 5]
+array_b = [4, 6, 7, 8]
+
+def merge(array1, array2):
+    array_c = []
+    array1_index = 0
+    array2_index = 0
+    while array1_index < len(array1) and array2_index < len(array2):
+        if array1[array1_index] < array2[array2_index]:
+            array_c.append(array1[array1_index])
+            array1_index += 1
+        else:
+            array_c.append(array2[array2_index])
+            array2_index += 1
+    if array1_index == len(array1):
+        while array2_index < len(array2):
+            array_c.append(array2[array2_index])
+            array2_index += 1
+    if array2_index == len(array2):
+        while array1_index < len(array1):
+            array_c.append(array1[array1_index])
+            array1_index += 1
+    return array_c
+
+print(merge(array_a, array_b))
+```
+
+<aside> 💡 위의 방법은 단지 정렬된 배열을 합치는 것이다.
+
+</aside>
+
+### 분할 정복 (Divide and Conquer)
+
+분할 정복은 문제를 작은 2개의 문제로 분리하고 각각을 해결한 다음, 결과를 모아서 원래의 문제를 해결하는 전략이다.
+
+즉, 0부터 N까지 정렬한 걸 보기 위해서는 0부터 N/2 까지 정렬한 것과 N/2부터 N까지 정렬한 걸 합치면 된다. 라는 개념이다.
+
+```python
+array = [5, 3, 2, 1, 6, 8, 7, 4]
+
+# 총 시간 복잡도
+# 1. array 의 길이 N
+# 2. N/2 를 2개 비교하면서 합친다. = N
+# 3. N/4 를 2개씩 비교하면서 합친다. = N
+# 4. N/8 을 2개씩 비교하면서 합친다. = N
+# 모든 단계에서 N만큼의 시간 복잡도가 걸리므로
+# log2N * O(N) -> O(NlogN) 만큼의 시간 복잡도
+def merge_sort(array):
+    if len(array) <= 1:
+        return array
+    mid = len(array) // 2
+    left_array = merge_sort(array[:mid])
+    right_array = merge_sort(array[mid:])
+    print(array)
+    print('left_array', left_array)
+    print('right_array',right_array)
+    return merge(left_array, right_array)
+
+# 시간 복잡도
+# O(N) -> array1 + array2 = array 즉 반으로 나눈 배열들이 다시 합쳐져서 N이 되므로 N만큼 시간이 걸린다.
+def merge(array1, array2):
+    result = []
+    array1_index = 0
+    array2_index = 0
+    while array1_index < len(array1) and array2_index < len(array2):
+        if array1[array1_index] < array2[array2_index]:
+            result.append(array1[array1_index])
+            array1_index += 1
+        else:
+            result.append(array2[array2_index])
+            array2_index += 1
+
+    if array1_index == len(array1):
+        while array2_index < len(array2):
+            result.append(array2[array2_index])
+            array2_index += 1
+
+    if array2_index == len(array2):
+        while array1_index < len(array1):
+            result.append(array1[array1_index])
+            array1_index += 1
+
+    return result
+
+print(merge_sort(array))
+```
