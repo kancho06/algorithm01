@@ -16,8 +16,9 @@
 - [링크드 리스트](#링크드-리스트)
 - [이진 탐색과 순차 탐색](#이진-탐색과-순차-탐색)
 - [정렬](#정렬)
-
-
+- [스택](#스택)
+- [큐](#큐)
+- [해쉬](#해쉬)
 
 ---
 
@@ -903,4 +904,295 @@ def merge(array1, array2):
     return result
 
 print(merge_sort(array))
+```
+
+
+
+---
+
+
+
+## 스택
+
+<aside> 📘 스택이란 한쪽 끝으로만 자료를 넣고 뺄 수 있는 자료 구조. [컴퓨터인터넷IT용어대사전]
+
+</aside>
+
+### 스택이란 자료구조는 왜 필요할까?
+
+넣은 순서를 쌓아두고 있기 때문이다.
+
+그 순서가 필요한 경우, 예를 들어 컴퓨터의 **되돌리기(Ctrl + Z)** 기능 등 내가 했던 행동들을 순서대로 기억해야 하므로 스택을 사용한다.
+
+### 스택의 구현
+
+**push(data) :** 맨 위에 데이터 넣기
+
+**pop() :** 맨 위의 데이터 뽑기
+
+**peek() :** 맨 위의 데이터 보기
+
+**isEmpty() :** 스택이 비었는지 안 비었는지 여부 반환
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class Stack:
+    def __init__(self):
+        self.head = None
+
+    def push(self, value):
+        new_head = Node(value)
+        new_head.next = self.head
+        self.head = new_head
+        return
+
+    # pop 기능 구현
+    def pop(self):
+        if self.is_empty():
+            return "Stack is Empty"
+        delete_head = self.head
+        self.head = self.head.next
+        return delete_head
+
+    def peek(self):
+        if self.is_empty():
+            return "Stack is Empty"
+        return self.head.data
+
+    # isEmpty 기능 구현
+    def is_empty(self):
+        return self.head is None
+
+stack = Stack()
+stack.push(3)
+print(stack.peek())
+stack.push(4)
+print(stack.peek())
+print(stack.pop().data)
+print(stack.peek())
+print(stack.is_empty())
+print(stack.pop().data)
+print(stack.is_empty())
+```
+
+연습문제
+
+```python
+top_heights = [6, 9, 5, 7, 4]
+
+# 문제
+# 탑은 왼쪽으로 레이져를 쏘고 자기보다 높은 탑만이 수신할 수 있다.
+# 수신한 탑의 인덱스 번호를 신호를 보낸 인덱스 자리에 출력하시오
+
+# 총 시간 복잡도
+#   O(N**2)
+def get_receiver_top_orders(heights):
+    answer = [0] * len(heights)
+    while heights: # heights 가 빈 상태가 아닐때까지      O(N)
+        height = heights.pop()
+        for idx in range(len(heights) - 1, 0, -1):     # 마지막 6은 측정할 필요없으므로 heights - 1 해준다      O(N)
+            if heights[idx] > height:       # 탑이 바뀌는 순간
+                answer[len(heights)] = idx + 1      # answer[len(heights)] = 4번째 인덱스 = idx(3) + 1 = 즉 answer 의 4번째 인덱스는 4 가 된다.
+                break
+    return answer
+
+print(get_receiver_top_orders(top_heights))  # [0, 0, 2, 2, 4] 가 반환되어야 한다!
+```
+
+
+
+---
+
+
+
+## 큐
+
+<aside> 📘 한쪽 끝으로 자료를 넣고, 반대쪽에서는 자료를 뺄 수 있는 선형구조. [컴퓨터인터넷IT용어대사전]
+
+</aside>
+
+### 큐라는 자료구조는 왜 필요할까?
+
+순서대로 처리되어야 하는 일에 필요하다.
+
+주문이 들어왔을 때 먼저 들어온 순서대로 처리해야 할 때,
+
+혹은 먼저 해야 하는 일들을 저장하고 싶을 때 큐를 사용한다.
+
+### 큐의 구현
+
+**enqueue(data) :** 맨 뒤에 데이터 추가하기
+
+**dequeue() :** 맨 위의 데이터 뽑기
+
+**peek() :** 맨 위의 데이터 보기
+
+**isEmpty() :** 큐가 비었는지 안 비었는지 여부 반환해주기
+
+<aside> ❗ 스택과 다르게 큐는 끝과 시작의 노드를 전부 가지고 있어야 하므로, self.head 와 self.tail 을 가지고 시작한다.
+
+</aside>
+
+```python
+class Node:
+    def __init__(self, data):
+        self.data = data
+        self.next = None
+
+class Queue:
+    def __init__(self):
+        self.head = None
+        self.tail = None
+
+    def enqueue(self, value):
+        new_node = Node(value)
+        if self.is_empty():
+            self.head = new_node
+            self.tail = new_node
+            return
+        self.tail.next = new_node
+        self.tail = new_node
+        return
+
+    def dequeue(self):
+        if self.is_empty():
+            return "Queue is Empty"
+        delete_head = self.head
+        self.head = self.head.next
+        return delete_head.data
+
+    def peek(self):
+        if self.is_empty():
+            return "Queue is Empty"
+        return self.head.data
+
+    def is_empty(self):
+        return self.head is None
+
+queue = Queue()
+queue.enqueue(3)
+print(queue.peek())
+queue.enqueue(4)
+print(queue.peek())
+queue.enqueue(5)
+print(queue.peek())
+print(queue.dequeue())
+print(queue.peek())
+print(queue.is_empty())
+print(queue.dequeue())
+print(queue.dequeue())
+print(queue.peek())
+print(queue.is_empty())
+```
+
+
+
+---
+
+
+
+## 해쉬
+
+### 해쉬 테이블이란?
+
+<aside> 📘 컴퓨팅에서 키를 값에 매핑할 수 있는 구조인, 연관 배열 추가에 사용되는 자료 구조이다. 해시 테이블은 해시 함수를 사용하여 색인(index)을 버킷(bucket)이나 슬롯(slot)의 배열로 계산한다. 데이터를 다루는 기법 중에 하나로 데이터의 검색과 저장이 아주 빠르게 진행된다. 파이썬 딕셔너리를 해쉬 테이블이라고 부르기도 한다.
+
+</aside>
+
+키를 통해 바로 데이터를 받아올 수 있으므로, 속도가 획기적으로 빨라진다.
+
+배열을 다 둘러보지 않고, 키에 대해 검색하면 바로 값을 조회할 수 있는 유용한 자료구조이다.
+
+하지만 딕셔너리가 사실 내부적으로는 배열을 사용하고 있다.
+
+### 해쉬의 구현
+
+이렇게 구현할 시 **해쉬 충돌(Hash Collision)**이 일어나서 데이터가 유실될 가능성이 있다.
+
+```python
+class Dict:
+    def __init__(self):
+        self.items = [None] * 8
+
+    def put(self, key, value):
+        index = hash(key) % len(self.items)
+        self.items[index] = value
+        return
+
+    def get(self, key):
+        index = hash(key) % len(self.items)
+        return self.items[index]
+
+my_dict = Dict()
+my_dict.put("test", 3)
+print(my_dict.get("test"))
+```
+
+해쉬 충돌 첫번째 해결방법 → **체이닝(Chaining)**
+
+**링크드 리스트**를 사용하여 데이터 유실을 막는 방법
+
+```python
+class LinkedTuple:
+    def __init__(self):
+        self.items = list()
+
+    def add(self, key, value):
+        self.items.append((key, value))
+
+    def get(self, key):
+        for k, v in self.items:
+            if key == k:
+                return v
+
+class LinkedDict:
+    def __init__(self):
+        self.items = []
+        for i in range(8):
+            self.items.append(LinkedTuple())  # [LinkedTuple(), LinkedTuple(), LinkedTuple(), LinkedTuple(), ...]
+
+    def put(self, key, value):
+        index = hash(key) % len(self.items)
+        self.items[index].add(key, value)
+
+    def get(self, key):
+        index = hash(key) % len(self.items)
+        return self.items[index].get(key)
+```
+
+해쉬 충돌 두번째 해결방법 → **개방 주소법(Open Addressing)**
+
+배열의 다음 남는 공간에 넣는 방법
+
+
+
+**연습문제**
+
+<aside> ❓ 단 한 명의 학생을 제외하고는 모든 학생이 출석했다. 모든 학생의 이름이 담긴 배열과 출석한 학생들의 배열이 주어질 때, 출석하지 않은 학생의 이름을 반환하시오.
+
+</aside>
+
+```python
+all_students = ["나연", "정연", "모모", "사나", "지효", "미나", "다현", "채영", "쯔위"]
+present_students = ["정연", "모모", "채영", "쯔위", "사나", "나연", "미나", "다현"]
+
+# 총 시간 복잡도  O(N)
+# 공간 복잡도도 O(N)
+# 해쉬는 시간 복잡도의 효율은 극대화 시킬 수 있지만 공간 복잡도를 대신 사용한다.
+def get_absent_student(all_array, present_array):
+    student_dick = {}
+    for key in all_array:       # O(N)
+        student_dick[key] = True    # 공간 복잡도 O(N)
+
+    for key in present_array:   # O(N)
+        del student_dick[key]
+
+    for key in student_dick.keys():
+        return key
+
+print(get_absent_student(all_students, present_students))
 ```
