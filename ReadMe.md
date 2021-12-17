@@ -1,4 +1,4 @@
-## Python 알고리즘 공부
+Python 알고리즘 공부
 
 <a href="https://available-parent-09c.notion.site/TIL-e74b792f460e4a7fa72987bfbfe2cf94"><img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=Notion&logoColor=white&link=https://available-parent-09c.notion.site/TIL-e74b792f460e4a7fa72987bfbfe2cf94"/></a>
 
@@ -20,6 +20,8 @@
 - [큐](#큐)
 - [해쉬](#해쉬)
 - [트리](#트리)
+- [힙](#힙)
+- [DFS와 BFS](#DFS와-BFS)
 
 ---
 
@@ -1296,7 +1298,6 @@ print(get_absent_student(all_students, present_students))
 ### 트리의 종류
 
 <aside> 👉 트리는 이진 트리, 이진 탐색 트리, 균형 트리(AVL 트리, red-black 트리), 이진 힙(최대힙, 최소힙)등 되게 다양한 트리가 있지만, 여기에선 이진트리와 완전 이진트리만 다루어보겠다.
-
 **이진 트리(Binary Tree)**의 특징은 바로 **각 노드가 최대 두개의 자식을 가진다**는 것이다. 하위의 노드가 4~5개 일 수 없다. 무조건 0, 1, 2 개만 있어야 한다.
 
 </aside>
@@ -1327,11 +1328,613 @@ print(get_absent_student(all_students, present_students))
          o   o o              level 2 # 이진 트리 (o)  완전 이진 트리 (o)
 ```
 
+
+
 ### 트리의 구조표현
+
+- 완전 이진트리 배열 표현
 
 <aside> 👉 트리 구조를 표현하는 방법은 직접 클래스를 구현해서 사용하는 방법이 있고, 배열로 표현하는 방법이 있다.
 
-**완전 이진 트리**를 쓰는 경우에 배열을 사용할 수 있다. 완전 이진 트리는 왼쪽부터 데이터가 쌓이게 되는데, 이를 순서대로 ****배열에 쌓으면서 표현할 수 있다.
+**완전 이진 트리**를 쓰는 경우에 배열을 사용할 수 있다. 완전 이진 트리는 왼쪽부터 데이터가 쌓이게 되는데, 이를 순서대로 배열에 쌓으면서 표현할 수 있다.
 
 </aside>
 
+```python
+트리를 구현할 때는 편의성을 위해 0번째 인덱스는 사용되지 않는다.
+그래서 None 값을 배열에 넣고 시작한다. [None]
+
+         8        level 0 -> [None, 8] 첫번째 레벨의 8을 넣고,
+       6   3      level 1 -> [None, 8, 6, 3] 다음 레벨인 6, 3을 넣고
+      4 2 5       level 2 -> [None, 8, 6, 3, 4, 2, 5] 다음 레벨인 4, 2, 5를 넣는다.
+
+이 배열을 활용해서 트리 구조를 분석해보자
+
+1. 현재 인덱스 * 2 -> 왼쪽 자식의 인덱스
+2. 현재 인덱스 * 2 + 1 -> 오른쪽 자식의 인덱스
+3. 현재 인덱스 // 2 -> 부모의 인덱스
+```
+
+- 완전 이진 트리의 높이
+
+<aside> 👉 트리의 높이(Height)는, 루트 노드부터 가장 아래 리프 노드까지의 길이이다. 예를 들어 다음과 같은 트리의 높이는 2라고 한다.
+
+</aside>
+
+```python
+         o      level 0  # 루트 노드
+       o   o    level 1 
+     o  o o     level 2  # 가장 아래 리프 노드
+
+이 트리의 높이는? 2 - 0 = 2!
+```
+
+- 최대 노드 개수
+
+<aside> 👉 각 레벨에 노드가 꽉 차있을 때
+
+레벨을 k라고 한다면 각 레벨에 최대로 들어갈 수 있는 노드의 개수는 2^k 개수 임을 알 수 있다.
+
+</aside>
+
+```python
+         1                level 0 -> 1개
+       2   3              level 1 -> 2개
+     4  5 6  7            level 2 -> 4개
+   8 9 . . . . .14 15     level k -> 2^k 개
+```
+
+<aside> ❓ 높이가 h이고 모든 노드가 꽉 차 있는 완전 이진 트리의 모든 노드의 개수는?
+
+</aside>
+
+```python
+1 + 2^1 + 2^2 + 2^3 + 2^4 ....... 2^h
+
+이를 수식으로 표현하면 2^(h+1) - 1 이 된다. 
+
+최대 노드가 N일때 , h는?
+
+h = log2(N + 1) - 1 이 된다.
+
+이진 트리의 높이는 최대로 해봤자 O(log(N)) 이다.
+```
+
+
+
+---
+
+
+
+## 힙
+
+<aside> 📘 힙은 데이터에서 최대값과 최소값을 빠르게 찾기 위해 고안된 완전 이진 트리(Complete Binary Tree)
+
+</aside>
+
+<aside> 💡 항상 최대의 값들이 필요한 연산이 있다면 힙을 사용하면된다.
+
+힙은 항상 큰 값이 상위 레벨에 있고 작은 값이 하위 레벨에 있도록 하는 자료구조이다. 다시 말하면 부모 노드의 값이 자식 노드의 값보다 항상 커야 한다. 그러면 가장 큰 값은 모든 자식보다 커야 하기 때문에 가장 위로간다.
+
+</aside>
+
+```python
+         8        level 0
+       6   3      level 1
+        2 1       level 2 # -> 이진 트리 o 완전 이진 트리 x 이므로 힙이 아니다.
+
+         8        level 0
+       6   3      level 1 # -> 이진 트리 o 완전 이진 트리 x 인데 모든 부모 노드의 값이
+     4  2 1       level 2 # 자식 노드보다 크니까 힙이 맞다.
+
+         8        level 0
+       6   3      level 1 # -> 이진 트리 o 완전 이진 트리 x 인데 모든 부모 노드의 값이
+     4  2 5       lebel 2 # 자식 노드보다 크지 않아서 힙이 아니다.
+```
+
+<aside> 💡 힙은 다음과 같이 최대값을 맨 위로 올릴수도 있고, 최솟값을 맨 위로 올릴 수도 있다.
+
+최댓값이 맨 위인 힙을 Max 힙, 최솟값이 맨 위인 힙을 Min 힙이라고 한다.
+
+</aside>
+
+![heap](./read_me_img/heap.png)
+
+### 힙의 구현
+
+- 힙의 규칙
+  - Max 힙은 항상 큰 값이 상위 레벨에 있고 작은 값이 하위 레벨에 있어야한다.
+  - Min 힙은 항상 작은 값이 상위 레벨에 있고 큰 값이 하위 레벨에 있어야 한다.
+
+<aside> ❓ 맥스 힙은 원소를 추가, 제거한 다음에도 맥스 힙의 규칙을 유지해야 한다. 맥스 힙에 원소를 추가, 제거하시오.
+
+</aside>
+
+맥스 힙 원소 추가
+
+```python
+# 완전 이진트리의 최대 높이는 O(log(N))
+# 그러면, 반복하는 최대 횟수도 O(log(N)) 이다.
+# 즉, 맥스 힙의 원소 추가는 O(log(N)) 만큼의 시간 복잡도를 가진다고 할 수 있다.
+class MaxHeap:
+    def __init__(self):
+        self.items = [None]  # 완전 이진 트리를 구현하기위해 0번째 인덱스를 None 으로 해준다.
+
+    def insert(self, value):
+        self.items.append(value)
+        cur_index = len(self.items) - 1  # None 은 제외 시킨다
+
+        while cur_index > 1:
+            parent_index = cur_index // 2  # 부모 노드 수식
+            if self.items[cur_index] > self.items[parent_index]:
+                self.items[parent_index], self.items[cur_index] = self.items[cur_index], self.items[parent_index]
+                cur_index = parent_index
+            else:
+                break
+        return
+
+max_heap = MaxHeap()
+max_heap.insert(3)
+max_heap.insert(4)
+max_heap.insert(2)
+max_heap.insert(9)
+print(max_heap.items)  # [None, 9, 4, 2, 3] 가 출력되어야 합니다!
+```
+
+맥스 힙 원소 제거
+
+<aside> 👉 최대 힙에서 원소를 삭제하는 방법은 최댓값, 루트 노드를 삭제하는 것이다. 스택과 같이 맨위에 있는 원소만 제거할 수 있고, 다른 위치의 노드를 삭제할 수 없다.
+
+</aside>
+
+```python
+# 시간 복잡도 O(log(N))
+    def delete(self):
+        self.items[1], self.items[-1] = self.items[-1], self.items[1]
+        prev_max = self.items.pop()
+
+        cur_index = 1
+
+        while cur_index <= len(self.items) - 1:
+            left_child_index = cur_index * 2
+            right_child_index = cur_index * 2 + 1
+            max_index = cur_index
+
+            if left_child_index <= len(self.items) - 1 and self.items[left_child_index] > self.items[max_index]:
+                max_index = left_child_index
+
+            if right_child_index <= len(self.items) - 1 and self.items[right_child_index] > self.items[max_index]:
+                max_index = right_child_index
+
+            if max_index == cur_index:
+                break
+
+            self.items[cur_index], self.items[max_index] = self.items[max_index], self.items[cur_index]
+
+        return prev_max
+
+max_heap = MaxHeap()
+max_heap.insert(8)
+max_heap.insert(6)
+max_heap.insert(7)
+max_heap.insert(2)
+max_heap.insert(5)
+max_heap.insert(4)
+print(max_heap.items)  # [None, 8, 6, 7, 2, 5, 4]
+print(max_heap.delete())  
+print(max_heap.items)  # [None, 7, 6, 4, 2, 5]
+```
+
+
+
+---
+
+
+
+## 그래프
+
+<aside> 📘 연결되어 있는 정점과 정점간의 관계를 표현할 수 있는 자료구조.[천재학습백과]
+
+</aside>
+
+<aside> 💡 트리에서 비선형 구조는 표현에 초점이 맞춰져 있다고 했는데, 이번 자료구조인 그래프는 **연결관계**에 초점이 맞춰져 있습니다.
+
+페이스 북을 예로들면, 나는 친구 "제니"를 알고 있고, "로제"와 친하다. 그리고 "로제"는 트와이스 "사나"를 안다고 하면, 나는 "사나"와 2촌 관계라고 말할 수 있다.
+
+</aside>
+
+### 그래프 구성
+
+<aside> 👉 그래프에서 사용되는 용어
+
+**노드(Node) :** 연결 관계를 가진 각 데이터를 의미한다. 정점(Vertex)라고도 한다. **간선(Edge) :** 노드 간의 관계를 표시한 선 **인접 노드(Adjacent Node) :** 간선으로 직접 연결된 노드(또는 정점)
+
+</aside>
+
+```python
+          로제 - 사나
+           |
+   제니 - 재성
+
+재성이는 연결 관계를 가진 데이터, **노드(Node)이다**.
+재성과 제니는 **간선(Edge)으로** 연결되어 있다.
+재성과 로제는 **인접 노드(Adjacent Node)**이다.
+```
+
+### 그래프 종류
+
+<aside> 👉 그래프는 유방향 그래프와 무방향 그래프 두가지가 있지만, 지금은 무방향 그래프에 대해서만 설명한다.
+
+유방향 그래프(Directed Graph) : 방향이 있는 간선을 갖는다. 간선은 단방향 관계를 나타내며, 각 간선은 한방향으로만 진행할 수 있다.
+
+무방향 그래프(Undirected Graph) : 방향이 없는 간선을 갖는다.
+
+</aside>
+
+![graph](./read_me_img/graph.png)
+
+### 그래프 표현 방법
+
+<aside> 👉 그래프라는 개념을 컴퓨터에서 표현하는 방법은 두가지가 있다.
+
+1. 인접행렬(Adjacency Matrix) : 2차원 배열로 그래프의 연결 관계를 표현
+2. 인접 리스트(Adjacnecy List) : 링크드 리스트로 그래프의 연결 관계를 표현
+
+더 쉽게 표기하기 위해서 각 노드들에 번호를 매겨보겠다.
+
+제니를 0, 재성을 1, 로제를 2, 사나를 3 라고 하겠다.
+
+</aside>
+
+```python
+         2 - 3
+         |
+     0 - 1
+
+1. **이를 인접 행렬, 2차원 배열로 나타내면 다음과 같다.**
+   0  1  2  3
+0  X  O  X  X
+1  O  X  O  X
+2  X  O  X  O
+3  X  X  O  X
+
+이것을 배열로 표현하면 다음과 같다.
+graph = [
+		[False, True, False, False],
+		[True, False, True, False],
+		[False, True, False, True],
+		[False, False, True, False]
+]
+
+2. **인접 리스트로 표현하면 다음과 같다.**
+인접 리스트는 모든 노드에 연결된 노드에 대한 정보를 차례대로 다음과 같이 저장한다.
+(어떤 노드를 바라보고 있는지) 
+0 -> 1
+1 -> 0 -> 2
+2 -> 1 -> 3
+3 -> 2
+
+이것을 딕셔너리로 표현하면 다음과 같다.
+graph = {
+		0: [1],
+		1: [0,1],
+		2: [1,3],
+		3: [2]
+}
+```
+
+<aside> ❓ 이 두 방식의 차이는 무엇일까?
+
+</aside>
+
+<aside> 👉 바로 시간 VS 공간 이다.
+
+인접 행렬로 표현하면 즉각적으로 0과 1이 연결되었는지 여부를 바로 알 수 있다. 그러나, 모든 조합의 연결 여부를 저장해야 되기 때문에 **O(노드^2)** 만큼의 공간을 사용한다.
+
+인접 리스트로 표현하면 즉각적으로 연결되었는지 알 수 없고, 각 리스트를 돌아봐야 한다. 따라서 연결되었는지 여부를 알기 위해서 최대 O(간선) 만큼의 시간을 사용해야 한다. 대신 모든 조합의 연결 여부를 저장할 필요가 없으니 **O(노드 + 간선)** 만큼의 공간을 사용하게 된다.
+
+</aside>
+
+
+
+---
+
+
+
+## DFS와 BFS
+
+**DFS**
+
+<aside> 📘 자료의 검색, 트리나 그래프를 탐색하는 방법. 한 노드를 시작으로 인접한 다른 노드를 재귀적으로 탐색해가고 **끝까지 탐색하면** 다시 위로 와서 다음을 탐색하여 검색한다. [컴퓨터인터넷IT용어대사전]
+
+</aside>
+
+**BFS**
+
+<aside> 📘 한 노드를 시작으로 **인접한** 모든 정점들을 **우선 방문하는** 방법. 더 이상 방문하지 않은 정점이 없을때까지 방문하지 않은 모든 정점들에 대해서도 넓이 우선 검색을 적용한다. [컴퓨터인터넷IT용어대사전]
+
+</aside>
+
+<aside> 👉 왜 DFS & BFS 를 배울까?
+
+정렬된 데이터를 이분 탐색하는 것처럼 아주 효율적인 방법이 있는 반면에, 모든 경우의 수를 **전부 탐색해야 하는** 경우도 있다.
+
+대표적인 예시가 **알파고**이다. 대국에서 발생하는 모든 수를 계산하고 예측해서 최적의 수를 계산해내기 위해 모든 수를 전부 탐색해야 한다.
+
+DFS와 BFS는 그 탐색하는 순서에서 차이가 있다. DFS 는 끝까지 파고드는 것이고, BFS 는 갈라진 모든 경우의 수를 탐색해보고 오는 것이 차이첨이다.
+
+</aside>
+
+**차이점**
+
+<aside> 👉 **DFS** 는 끝까지 파고드는 것이라, 그래프의 최대 깊이 만큼의 공간을 요구한다. 따라서 공간을 적게 쓰지만, 최단 경로를 탐색하기 쉽지 않다.
+
+**BFS** 는 모든 분기되는 수를 다 탐색해서 최단 경로를 쉽게 찾을 수 있다. 그러나, 모든 분기되는 수를 다 저장하다보니 공간을 많이 써야하고, 모든 걸 다 보고 오다보니 시간이 더 오래걸릴 수 있다.
+
+</aside>
+
+### DFS 구현
+
+<aside> 👉 DFS 는 Depth First Search(깊이 우선 탐색)의 약자이다.
+
+갈 수 있는 만큼 계속해서 탐색하다가 갈 수 없게 되면 다른 방향으로 다시 탐색하는 구조이다.
+
+- 노드를 방문하고 **깊이 우선으로 인접한** 노드를 방문한다.
+- 또 그 노드를 방문해서 **깊이 우선으로 인접한** 노드를 방문한다.
+- **만약 끝에** 도달했다면 리턴한다.
+
+반복하다가 .. 갈 수 없게 되면 .. 탈출 조건 재귀함수를 이용해서 구현해보자
+
+</aside>
+
+<aside> ❓ 인접 리스트가 주어질 때, 모든 노드를 DFS 순서대로 방문하시오
+
+</aside>
+
+```python
+graph = {
+    1: [2, 5, 9],
+    2: [1, 3],
+    3: [2, 4],
+    4: [3],
+    5: [1, 6, 8],
+    6: [5, 7],
+    7: [6],
+    8: [5],
+    9: [1, 10],
+    10: [9]
+}
+visited = []
+
+# 1. 시작 노드(루트 노드)인 1부터 탐색
+# 2. 현재 방문한 노드를 visited_array 에 추가한다.
+# 3. 현재 방문한 노드와 인접한 노드 중 반문하지 않은 노드에 방문한다.
+def dfs_recursion(adjacent_graph, cur_node, visited_array):
+    visited_array.append(cur_node)
+    for adjacent_node in adjacent_graph:
+        if adjacent_node not in visited_array:
+            dfs_recursion(adjacent_graph, adjacent_node, visited_array)
+    return
+
+dfs_recursion(graph, 1, visited)  # 1 이 시작노드
+print(visited)  # [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] 이 출력되어야 한다.
+```
+
+<aside> ❗ 성공적으로 구현햇으나 재귀함수를 통해서는 DFS의 깊이가 무한정 깊어지면 RecursionError 가 발생할 수 있다.
+
+DFS는 탐색하는 원소를 최대한 깊게 따라가야 한다. 이걸 다시 말하면 인접한 노드 중 방문하지 않은 모든 노드들을 저장해두고, 가장 마지막에 넣은 노드들만 꺼내서 탐색하면 된다.
+
+**가장 마지막에 넣은 노드** → **스택**을 이용하면 DFS 를 재귀 없이 구현할 수 있다.
+
+</aside>
+
+```python
+graph = {
+    1: [2, 5, 9],
+    2: [1, 3],
+    3: [2, 4],
+    4: [3],
+    5: [1, 6, 8],
+    6: [5, 7],
+    7: [6],
+    8: [5],
+    9: [1, 10],
+    10: [9]
+}
+
+# 1. 시작 노드를 스택에 넣는다.
+# 2. 현재 스택의 노드를 빼서 visited 에 추가한다.
+# 3. 현재 방문한 노드와 인접한 노드중에서 방문하지 않은 노드를 스택에 추가한다.
+
+def dfs_stack(adjacent_graph, start_node):
+    stack = [start_node]
+    visited = []
+
+    while stack:
+        current_node = stack.pop()
+        visited.append(current_node)  # [1]
+        for adjacent_node in adjacent_graph[current_node]:
+            if adjacent_node not in visited:
+                stack.append(adjacent_node)
+    return visited
+
+print(dfs_stack(graph, 1))  # 1 이 시작노드
+# [1, 9, 10, 5, 8, 6, 7, 2, 3, 4] 이 출력되어야 한다.
+```
+
+### BFS 구현
+
+<aside> 👉 BFS 는 Breadth First Search(너비 우선 탐색)의 약자이다.
+
+현재 인접한 노드를 먼저 방문해야 한다. 인접한 노드 중 방문하지 않은 모든 노드들을 저장해서 가장 처음에 넣은 노드를 꺼내서 탐색하면 된다.
+
+가장 처음에 넣은 노드 → **큐**를 이용하면 BFS를 구현할 수 있다.
+
+</aside>
+
+<aside> ❓ 인접 리스트가 주어질 때, 모든 노드를 BFS 순서대로 방문하시오.
+
+</aside>
+
+```python
+graph = {
+    1: [2, 3, 4],
+    2: [1, 5],
+    3: [1, 6, 7],
+    4: [1, 8],
+    5: [2, 9],
+    6: [3, 10],
+    7: [3],
+    8: [4],
+    9: [5],
+    10: [6]
+}
+
+# 1. 시작 노드를 큐에 넣는다.
+# 2. 현재 큐의 노드를 빼서 visited 에 추가한다.
+# 3. 현재 방문한 노드와 인접한 노드 중 방문하지 않은 노드를 큐에 추가한다.
+
+def bfs_queue(adj_graph, start_node):
+    queue = [start_node]
+    visited = []
+    while queue:
+        current_node = queue.pop(0)
+        visited.append(current_node)
+        for adjacent_node in adj_graph[current_node]:
+            if adjacent_node not in visited:
+                queue.append(adjacent_node)
+    return visited
+
+print(bfs_queue(graph, 1))  # 1 이 시작노드
+# [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] 이 출력되어야 한다.
+```
+
+
+
+---
+
+
+
+## Dynamic Programming
+
+### 피보나치 수열 - 재귀함수
+
+<aside> 👉 동적 계획법에 대해 설명하기 전에, 피보나치 문제를 풀어보면서 필요성을 느껴보자.
+
+</aside>
+
+<aside> 📘 피보나치 수열이란?
+
+수학에서, 피보나치 수(Fibonacci numbers)는 첫째 및 둘째 항이 1이며 그 뒤의 모든 항은 바로 앞 두 항의 합인 수열이다. 처음 여섯 항은 각각 1, 1, 2, 3, 5, 8이다. [위키백과]
+
+</aside>
+
+<aside> 👉 즉, n번째 피보나치 수를 Fibo(n)라고 표현 한다면, Fibo(1) 은 1이고, Fibo(2) 도 1이다. (첫째 및 둘째 항은 1)
+
+Fibo(3) 부터는 이전 값과 이전 이전 값의 합이다. 
+
+즉, Fibo(3) = Fibo(1) + Fibo(2) = 1 + 1 = 2 이다.
+
+Fibo(4) = Fibo(3) + Fibo(2) = 2 + 1 = 3 
+
+Fibo(5) = Fibo(4) + Fibo(3) = 3 + 2 = 5 
+
+Fibo(6) = Fibo(5) + Fibo(4) = 5 + 3 = 8 .... 
+
+Fibo(n) = Fibo(n - 1) + Fibo(n - 2) 라고 표현할 수 있다.
+
+반복되는 형태를 보니 재귀함수로 풀 수 있을거같다.
+
+</aside>
+
+<aside> ❓ 피보나치 수열의 20번째 수를 구하시오.
+
+</aside>
+
+```python
+input = 20
+
+# Fibo(N) = Fibo(N-1) + Fibo(N-2)
+# 탈출조건 Fibo(1) = Fibo(2) = 1
+
+def fibo_recursion(n):
+    if n == 1 or n == 2:
+        return 1
+    return fibo_recursion(n - 1) + fibo_recursion(n - 2)
+
+print(fibo_recursion(input))  # 6765
+
+재귀함수를 이용하면 반복되는 연산이 너무 많아져 
+input = 100 이 되면 연산량이 많아 값이 나오지 않는다.
+이런 반복 연산을 하지 않으려면 이미 했던 일을 기록하고 있어야한다.
+```
+
+### 동적 계획법(Dynamic Programming) 이란?
+
+<aside> 👉 재성이는 매일 회사로 출근한다. 그래서 출근하는 방법을 어떻게해야 가장 효율적인지 알고 싶다.
+
+집 - 봉천역 - 삼성역 -코엑스 까지 걸어가는 길인데,
+
+각각의 목적지까지 이동하는 방법은 지하철, 버스, 자전거, 킥보드가 있다.
+
+그래서 다음과 같이 매일 실험해봤다.
+
+1일 : 지하철(15분) - 지하철(20분) - 지하철(3분) 
+
+2일 : 지하철(15분) - 지하철(20분) - 버스(5분) 
+
+3일 : 지하철(15분) - 지하철(20분) - 자전거(4분) 
+
+4일 : 지하철(15분) - 지하철(20분) - 킥보드(6분) 
+
+5일 : 지하철(15분) - 버스(10분) - 지하철(3분) 
+
+6일 : 지하철(15분) - 버스(10분) - 버스(5분)   .......
+
+이렇게 모든 경우를 다 해보는것은 너무 비효율적이므로 각 구간마다 수단이 얼마나 걸리는지 기록해둔다.
+
+이러한 문제를 해결하기 위해서 동적 계획법이 탄생했다.
+
+</aside>
+
+<aside> 📘 동적 계획법이란 복잡한 문제를 간단한 여러 개의 문제로 나누어 푸는 방법을 말한다. 이것은 부분 문제 반복과 최적 부분 구조를 가지고 있는 알고리즘을 일반적인 방법에 비해 더욱 적은 시간 내에 풀 때 사용한다. [위키백과]
+
+</aside>
+
+<aside> 👉 동적 계획법은 여러개의 하위 문제를 풀고 그 결과를 기록하고 이용해 문제를 해결하는 알고리즘이다.
+
+즉, 우리가 재귀함수를 풀어나갈 때 많이 했던 함수의 수식화를 시키면 된다. `F(string) = F(string[1:n-2])` 라고 수식을 정의했던 것 처처럼, 문제를 쪼개서 정의할 수 있으면 동적 계획법을 쓸 수 있다.
+
+재귀 알고리즘과 다른점은 **그 결과를 기록하고 이용한다는 점**이다.
+
+결과를 기록하는 것을 **메모이제이션(Memoization)** 이라고 하고, 문제를 쪼갤 수 있는 구조를 **겹치는 부분 문제(Overlapping Subproblem)** 라고 한다.
+
+</aside>
+
+<aside> ❓ 피보나치 수열의 100번째 수를 구하시오.
+
+</aside>
+
+```python
+input = 100
+
+# memo 라는 변수에 Fibo(1)과 Fibo(2) 값을 저장해놨습니다!
+memo = {
+    1: 1,
+    2: 1
+}
+
+# 1. 만약 메모에 있으면 그 값을 바로 반환하고
+# 2. 없으면 수식대로 구한다.
+# 3. 그리고 그 값을 다시 메모에 기록한다.
+# 반복되는 형태로 파생되는 문제면 메모를 만들자 -> 다이나믹 프로그래밍
+def fibo_dynamic_programming(n, fibo_memo):
+    if n in fibo_memo:
+        return fibo_memo[n]
+
+    nth_fibo = fibo_dynamic_programming(n - 1, fibo_memo) + fibo_dynamic_programming(n - 2, fibo_memo)
+    fibo_memo[n] = nth_fibo
+    return nth_fibo
+
+print(fibo_dynamic_programming(input, memo))
+```
