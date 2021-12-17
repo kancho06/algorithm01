@@ -22,6 +22,7 @@ Python 알고리즘 공부
 - [트리](#트리)
 - [힙](#힙)
 - [DFS와 BFS](#DFS와-BFS)
+- [Dynamic Programming](#Dynamic-Programming)
 
 ---
 
