@@ -21,7 +21,7 @@ n = int(input())
 s = list(map(int, input().split()))
 s.sort()
 
-for i in range(1, n):
+for i in range(1, n):   # 리스트 s 를 이전 값을 더한 값으로 만든다
     s[i] += s[i-1]
 
-print(sum(s))
+print(sum(s))       # 모두 더해서 출력
