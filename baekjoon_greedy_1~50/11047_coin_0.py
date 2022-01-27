@@ -25,6 +25,6 @@ for i in range(n - 1, -1, -1):
         break
     if m[i] > k:
         continue
-    num += k // m[i]
-    k %= m[i]
+    num += k // m[i]        # k 를 m[i] 로 나눈 몫을 num 에다 더해준다. (동전 개수)
+    k %= m[i]       # 나머지를 k를 m[i] 로 나눈 나머지를 k에 할당한다. (나머지 최신화)
 print(num)
