@@ -38,17 +38,23 @@ n = int(input())
 roads = list(map(int, input().split()))
 costs = list(map(int, input().split()))
 
-r = roads[0] * costs[0]
+r = roads[0] * costs[0]  # 1
 m = costs[0]
 dist = 0
 for i in range(1, n - 1):
     if costs[i] < m:
-        r += m * dist
+        r += m * dist  # 2
         dist = roads[i]
-        m = costs[i]
+        m = costs[i]  # 3
     else:
         dist += roads[i]
 
-    if i == n - 2:
+    if i == n - 2:  # 4
         r += m * dist
 print(r)
+
+# 두 번째 도시로 가기 위해서 무조건 첫 번째에서 주유를 해야한다.  # 1
+# for 문을 돌면서 지금까지 주유 가격보다 이번 도시에서의 가격이 작으면
+# 지금까지 왔던거리 * 가장 작았던 주유가격을 곱해서 결과에 더해준다. # 2
+# 주유 가격을 제일 작은 가격으로 바꾼다. # 3
+# 마지막 도로에서 넘어갈 때 가격을 계산한다. # 4
