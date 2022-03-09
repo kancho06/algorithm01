@@ -11,12 +11,12 @@
 # 출력
 # 강의실의 개수를 출력하라.
 import heapq
-
+import sys
 
 n = int(input())
 time_list = []
 for i in range(n):
-    s, e = map(int, input().split())
+    s, e = map(int, sys.stdin.readline().split())
     time_list.append([s, e])
 
 time_list.sort(key=lambda x: x[0])
